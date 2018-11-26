@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
+import { withRouter } from "react-router-dom";
+import { connect } from 'react-redux';
+import { registerUser } from "../../actions/AuthActions";
 
 class Signup extends Component {
   constructor(props) {
@@ -9,8 +12,12 @@ class Signup extends Component {
 
 
   handleFormSubmit(data) {
-      console.log(data);
-      
+     this.props.registerUser(data, this.onSubmitComplete.bind(this));
+  }
+ 
+  onSubmitComplete() {
+    console.log('register succeed');
+    this.props.history.push("/signin");
   }
   
 
@@ -53,6 +60,11 @@ class Signup extends Component {
           </div>
         </div>
         <div>
+          <span style={{color: 'red'}}>
+            {this.props.auth.register_error}
+          </span>
+        </div>
+        <div>
           <button type="submit">
             Signup
           </button>
@@ -62,6 +74,17 @@ class Signup extends Component {
   }
 }
 
-export default reduxForm({
+Signup = reduxForm({
   form: 'signup' // a unique identifier for this form
 })(Signup);
+
+function mapStateToProp(state) {
+  return {
+    auth: state.auth
+  };
+}
+
+Signup = connect(mapStateToProp, { registerUser })(withRouter(Signup));
+
+
+export default Signup;
