@@ -60,7 +60,7 @@ export const loginUser = ({email, password}, callback) => {
         let expirationDate = new Date(now.getTime() + response.data.expires_in * 1000)
                               .getTime().toString();
         localStorage.setItem('expiresAt', expirationDate);
-      
+       
         
         dispatch({
           type: LOGIN_USER_SUCCESS,
