@@ -6,6 +6,8 @@ import {
   FETCH_TOKEN,
 } from './Types';
 import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
 const AUTH_SERVER_URL = 'http://localhost:5000';
 
 export const registerUser = ({email, password, fullName}, callback) => {
@@ -51,7 +53,6 @@ export const loginUser = ({email, password}, callback) => {
         
         
         localStorage.setItem('accessToken', response.data.access_token);
-        console.log('accessToken');
         
         localStorage.setItem('refreshToken', response.data.refresh_token);
         localStorage.setItem('idToken', response.data.id_token);
@@ -60,8 +61,9 @@ export const loginUser = ({email, password}, callback) => {
         let expirationDate = new Date(now.getTime() + response.data.expires_in * 1000)
                               .getTime().toString();
         localStorage.setItem('expiresAt', expirationDate);
-       
         
+
+
         dispatch({
           type: LOGIN_USER_SUCCESS,
           });
@@ -80,10 +82,9 @@ export const loginUser = ({email, password}, callback) => {
       })
       .catch(function (arg) {
               let errorMessage = "Something went wrong";
-              
-              
+                          
               if(arg.response && arg.response.data) {
-                errorMessage = data.response.data.error_description;
+                errorMessage = arg.response.data.error_description;
               }
 
               dispatch({ 
@@ -97,7 +98,6 @@ export const loginUser = ({email, password}, callback) => {
 
 
 const getUser = (idToken) => {
-
   let user = {
     fullname: '***',
     username:'***'
@@ -105,28 +105,9 @@ const getUser = (idToken) => {
 
   if (idToken) {
     var decoded = jwt_decode(idToken);
-    
-    user.fullname = decoded.fullname;
     user.username = decoded.name;
   }
 
   return user;
 
 }
-
-const _saveItem = (item, selectedValue) => {
-  try {
-      localStorage.setItem(item, selectedValue);
-  } catch (error) {
-      throw error;
-  }
-};
-
-const _getItem = (item) => {
-  try {
-     return localStorage.getItem(item);
-  } catch (error) {
-      throw error;
-  }
-};
-

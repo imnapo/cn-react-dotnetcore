@@ -18,8 +18,10 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
+            presets: ["babel-preset-env", "react"],
             plugins: [
-              "react-hot-loader/babel"
+              "react-hot-loader/babel",
+              "transform-class-properties"
             ]
           }
         }
