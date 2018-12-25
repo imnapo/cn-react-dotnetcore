@@ -22,21 +22,14 @@ class Signup extends Component {
   
 
   render() {
-    const { handleSubmit } = this.props
+    const { handleSubmit } = this.props;
+    console.log(this.props.auth.isLoading);
+    
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <div>
-          <label>Full Name</label>
-          <div>
-            <Field
-              name="fullName"
-              component="input"
-              type="text"
-              placeholder="Full Name"
-            />
-          </div>
-        </div>
-   
+
+        <h1>Sign up</h1>
+        <br/>
         <div>
           <label>email</label>
           <div>
@@ -60,12 +53,23 @@ class Signup extends Component {
           </div>
         </div>
         <div>
+          <label>Confirm Password</label>
+          <div>
+            <Field
+              name="confirmPassword"
+              component="input"
+              type="password"
+              placeholder="Confirm Password"
+            />
+          </div>
+        </div>
+        <div>
           <span style={{color: 'red'}}>
             {this.props.auth.register_error}
           </span>
         </div>
         <div>
-          <button type="submit">
+          <button type="submit" disabled={this.props.auth.isLoading ? 'disabled' : ''}>
             Signup
           </button>
         </div>

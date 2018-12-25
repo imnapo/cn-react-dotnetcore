@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MyApp.Core.Models;
 using OpenIddict.Abstractions;
+using OpenIddict.Mvc.Internal;
 
 namespace MyApp.Controllers
 {
@@ -30,8 +31,11 @@ namespace MyApp.Controllers
             _userManager = userManager;
         }
 
-        [HttpPost("~/connect/token"), Produces("application/json")]
-        public async Task<IActionResult> Exchange([FromBody] OpenIdConnectRequest request)
+        [
+          HttpPost("~/connect/token")
+         , Produces("application/json")
+        ]
+        public async Task<IActionResult> Exchange([ModelBinder(typeof(OpenIddictMvcBinder))] OpenIdConnectRequest request)
         {
             Debug.Assert(request.IsTokenRequest(),
                 "The OpenIddict binder for ASP.NET Core MVC is not registered. " +

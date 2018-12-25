@@ -34,17 +34,21 @@ namespace MyApp.Controllers
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
         [HttpPost("~/api/auth/register")]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
             EnsureDatabaseCreated(_applicationDbContext);
 
             if (ModelState.IsValid)
             {
+                if(model.Password != model.ConfirmPassword) 
+                {
+                    return BadRequest(new { general = new[] {"Password and Confirm Password not match"} });
+                }
+
                 var user = new ApplicationUser
                 { 
                     UserName = model.Email, 
-                    Email = model.Email, 
-                    FullName = model.FullName, 
+                    Email = model.Email 
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -63,7 +67,7 @@ namespace MyApp.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { errors = result.Errors.Select(x => x.Description).ToArray() });
+                    return BadRequest(new { general = result.Errors.Select(x => x.Description).ToArray() });
                 }
             }  
             else

@@ -9,12 +9,12 @@ class Signin extends Component {
     super(props);
   }
 
-  handleFormSubmit(data) {
-    this.props.loginUser(data, this.onSigninComplete.bind(this));
+  async handleFormSubmit(data) {
+    await this.props.loginUser(data, this.onSigninComplete.bind(this));
  }
 
  onSigninComplete() {
-   console.log('sigin succeed');
+   console.log('sign-in succeed');
    this.props.history.push("/");
  }
 
@@ -23,7 +23,8 @@ class Signin extends Component {
     const { handleSubmit } = this.props
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-   
+        <h1>Sign in</h1>
+        <br/>
         <div>
           <label>email</label>
           <div>

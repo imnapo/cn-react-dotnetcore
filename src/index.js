@@ -5,6 +5,10 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import reduxThunk from 'redux-thunk';
 
+//Polyfills for IE
+require('es6-promise').polyfill();
+require('./Polyfill/index').startsWith();
+require('./Polyfill/index').assign();
 
 import App from './components/App';
 import Signup from './components/auth/Signup';
@@ -12,12 +16,14 @@ import Signin from './components/auth/Signin';
 import Feature from './components/Feature';
 import RequiredAuth from './components/RequiredAuth';
 import reducers from './reducers/index';
+import Startup from './Startup';
 const createStoreWithMiddleware = applyMiddleware(reduxThunk)(createStore);
 
 
 ReactDOM.render(
   <Provider store={createStoreWithMiddleware(reducers)}> 
     <Router>
+      <Startup>
       <div>
           <ul>
           <li>
@@ -39,7 +45,8 @@ ReactDOM.render(
         <Route path="/Signin" component={Signin} />                                             
         <Route path="/Signup" component={Signup} />   
         <Route path="/Feature" component={RequiredAuth(Feature)} />
-      </div>              
+      </div>      
+      </Startup>        
   </Router>
   </Provider>
   ,
