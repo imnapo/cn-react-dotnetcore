@@ -5,7 +5,8 @@ import {
   LOGIN_USER_SUCCESS,
   LOGIN_USER_FAIL,
   LOGIN_USER_START,
-  FETCH_TOKEN
+  FETCH_TOKEN,
+  LOGOUT_USER
 } from './Types';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
@@ -121,7 +122,7 @@ export function loadThings() {
   
           let accessToken = localStorage.getItem('accessToken');       
           let expiresAt = localStorage.getItem('expiresAt');   
-
+       
             
             if (!isExpired(expiresAt)) {
               let idToken = localStorage.getItem('idToken');           
@@ -208,3 +209,16 @@ const isExpired = (expiresAt) => {
     return false;
   }
 }
+
+export const userLogout = () => {
+
+  return (dispatch) => {
+ 
+    localStorage.removeItem('expiresAt');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken');
+  
+      dispatch({ type: LOGOUT_USER });
+  }
+}
+

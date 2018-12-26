@@ -5,7 +5,8 @@ import {
   FETCH_TOKEN,
   LOGIN_USER_START,
   LOGIN_USER_FAIL,
-  LOGIN_USER_SUCCESS
+  LOGIN_USER_SUCCESS,
+  LOGOUT_USER
  } from "../actions/Types";
 
  const INITIAL_STATE = {
@@ -35,6 +36,9 @@ import {
         return { ...state, isLoading: false, isLogin:true, login_error: ''};
       case LOGIN_USER_FAIL:      
         return { ...state, login_error:action.payload , isLoading: false, isLogin: false, password:'' }
+      case LOGOUT_USER:          
+        return { ...INITIAL_STATE, isLogin: false};
+        break;
       default: return state;
    }
  }
