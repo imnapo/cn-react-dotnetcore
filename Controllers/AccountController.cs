@@ -1,5 +1,8 @@
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using cn_react_dotnetcore.Core.Services;
+using cn_react_dotnetcore.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,18 +19,22 @@ namespace MyApp.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IOptions<IdentityOptions> _identityOptions;
         private readonly ApplicationDbContext _applicationDbContext;
+
+        private readonly IEmailSender _emailSender;
         private static bool _databaseChecked;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             IOptions<IdentityOptions> identityOptions,
             SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender,
             ApplicationDbContext applicationDbContext
             )
         {
             _userManager = userManager;
             _identityOptions = identityOptions;
             _signInManager = signInManager;
+            _emailSender = emailSender;
             _applicationDbContext = applicationDbContext;
         }
 
@@ -78,6 +85,108 @@ namespace MyApp.Controllers
 
             // If we got this far, something failed, redisplay form
              //return BadRequest(new { errors = "Bad Request".ToArray() });
+        }
+
+
+        [AllowAnonymous]
+        [HttpPost("~/api/auth/forgetPassword")]
+        public async Task<IActionResult> ForgetPassword(string username) 
+        {
+
+          if(username == null)
+          {
+            return null;
+          }
+
+          var user = await _userManager.FindByEmailAsync(username);
+          if(user == null) 
+          {
+            user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+              throw new System.ApplicationException($"Unable to load user with ID '{username}'.");
+
+            }
+          }
+         
+          // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+          // Send an email with this link
+          var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        
+          var firstTimeLoginUrl = "http://localhost:5000/resetPassword/username/" + user.Id + "/code/" + code;
+          
+          // await _emailSender.SendEmailAsync(model.Email, model.EmployeeNo, "Welcome to Intranet",
+          //     "Please complete your registration by clicking this link: <a href=\"" + firstTimeLoginUrl + "\">link</a>"
+          //     , firstTimeLoginUrl);
+
+              await _emailSender.SendEmailAsync(user.Email, "Reset Password",
+              "Please clicking view button to reset your password."
+              );
+        
+          return Ok();
+
+        }
+
+
+        [HttpPost("~/api/auth/resetPassword")]
+        [AllowAnonymous]
+        // [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+           
+            ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                user = await _userManager.FindByNameAsync(model.EmployeeNo);
+
+                 if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    return BadRequest("the user does not exist");
+                }
+            }
+
+            var code = model.Code.Replace(" ", "+");
+          
+            var resetResult = await _userManager.ResetPasswordAsync(user, code, model.Password);
+            if (resetResult.Succeeded)
+            {
+                
+                return Ok();
+            }
+
+            return BadRequest(resetResult);
+        }
+
+        [HttpPost("~/api/auth/changePassword")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        // [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;           
+            string username = claimsIdentity.Name;
+
+            ApplicationUser user = await _userManager.FindByNameAsync(username);
+
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    return BadRequest("the user does not exist");
+                }
+                if(model.NewPassword != model.ConfirmPassword) 
+                {
+                    return BadRequest("the password and confirm password not match.");
+                }
+            
+          
+            var resetResult = await  _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (resetResult.Succeeded)
+            {
+                
+                return Ok();
+            }
+
+            return BadRequest(resetResult);
         }
 
 

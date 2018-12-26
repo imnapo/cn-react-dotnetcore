@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using AspNet.Security.OpenIdConnect.Primitives;
+using cn_react_dotnetcore.Core.Services;
 
 namespace MyApp
 {
@@ -28,7 +29,7 @@ namespace MyApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
+            services.AddTransient<IEmailSender, FileEmailSender>();
             services.AddDbContext<ApplicationDbContext>(o =>
             {
                 o.UseSqlServer(Configuration.GetConnectionString("Default"));   

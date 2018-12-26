@@ -222,3 +222,120 @@ export const userLogout = () => {
   }
 }
 
+export const forgotPassword = (username) => {
+  return async (dispatch) => {
+
+   
+    var params = `username=${username}`;
+    try {
+      let response = await axios.post(`${AUTH_SERVER_URL}/api/auth/forgetPassword`, params, header);    
+    
+      dispatch({ type: FORGOT_PASSWORD_SENT });
+
+            
+      if(callback)
+        callback();
+    } catch (error) {
+      console.log(error)
+      dispatch({ type: LOGIN_USER_FAIL });
+    }
+    
+};
+}
+
+export const changePassword = (password, newPassword, confirmPassword, callback) => {
+  return async (dispatch) => {
+    var params = `oldPassword=${password}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`;
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    axios.defaults.headers.post['Authorization'] = `Bearer ${localStorage.getItem('accessToken')}`;
+    try {
+      let response = await axios.post(`${AUTH_SERVER_URL}api/auth/changePassword`, params);
+      dispatch({
+        type: CHANGE_PASSWORD_SUCCEESS,
+        });
+
+        if(callback)
+        callback({
+          succeed : true,
+          error: ''
+        });
+    } catch (error) {
+      if(callback)
+        callback({
+          succeed : false,
+          error: 'something went wrong!'
+        });
+    }
+  };
+}
+
+export const resetPassword = (email, code, password, confirmPassword, callback) => {
+  return async (dispatch) => {
+    var params = `email=${email}&code=${code}&password=${password}&confirmPassword=${confirmPassword}`;
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+  try {
+    let response = await axios.post(`${AUTH_SERVER_URL}api/auth/resetPassword`, params);
+    dispatch({
+      type: RESET_PASSWORD_SUCCEESS,
+      });
+
+      if(callback)
+      callback({
+        succeed : true,
+        error: ''
+      });
+  } 
+  catch (error) {
+    if(callback)
+    callback({
+      succeed : false,
+      error: 'something went wrong!'
+    });
+  }
+  };
+}
+
+export const getResetPasswordInfo = (username, code, callback) => {
+  return async (dispatch) => {
+    var params = `userId=${username}&code=${code}`;
+    try {
+      let response = await axios.get(`${AUTH_SERVER_URL}api/auth/resetPassword?${params}`);
+      dispatch({
+        type:GET_FIRST_LOGIN_INFO,
+        payload:response.data
+    });
+    } catch (error) {
+      if(callback)
+      callback();
+    }
+     
+  };
+}
+
+export const getAccessTokenAsync = async () => {
+ 
+  
+  let token = await _getItem('accessToken');
+  let expiration = await _getItem('expiresAt');
+  if(token && expiration) {
+    if(isExpired(expiration) == false) {
+      
+        return token;
+    }
+    else {
+      let refToken = await _getItem('refreshToken');
+      const response = await refreshTokenApiAsync(refToken);
+      await _saveItem('accessToken', response.data.access_token);
+      const now = new Date();
+      let expirationDate = new Date(now.getTime() + response.data.expires_in * 1000).getTime().toString();
+      await _saveItem('expiresAt', expirationDate);
+      await _saveItem('idToken', response.data.id_token);
+
+      return response.data.access_token;
+       
+    }
+  }
+  else {
+
+  }
+}

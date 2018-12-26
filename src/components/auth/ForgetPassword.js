@@ -2,24 +2,23 @@ import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { withRouter } from "react-router-dom";
 import { connect } from 'react-redux';
-import { loginUser } from "../../actions/AuthActions";
+import { forgotPassword } from "../../actions/AuthActions";
 
-class Signin extends Component {
+class ForgetPassword extends Component {
   constructor(props) {
     super(props);
   }
 
   async handleFormSubmit(data) {
-    await this.props.loginUser(data, this.onSigninComplete.bind(this));
+    this.props.forgotPassword(data.email, ()=> {
+        
+      alert('forgot password sent successfully. you will receive an notification for reset your password.')
+  });
  }
 
- onSigninComplete() {
-   console.log('sign-in succeed');
-   this.props.history.push("/");
- }
 
- onForgetPasswordClicked = () => {
-  this.props.history.push("/forgetPassword");
+ onBackToLoginClicked = () => {
+  this.props.history.push("/signin");
  }
 
 
@@ -27,10 +26,10 @@ class Signin extends Component {
     const { handleSubmit } = this.props
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <h1>Sign in</h1>
+        <h1>Forgot your password?</h1>
         <br/>
         <div>
-          <label>email</label>
+          <label>Email</label>
           <div>
             <Field
               name="email"
@@ -40,17 +39,7 @@ class Signin extends Component {
             />
           </div>
         </div>
-        <div>
-          <label>Password</label>
-          <div>
-            <Field
-              name="password"
-              component="input"
-              type="password"
-              placeholder="Password"
-            />
-          </div>
-        </div>
+       
         <div>
           <span style={{color: 'red'}}>
             {this.props.auth.login_error}
@@ -58,10 +47,10 @@ class Signin extends Component {
         </div>
         <div>
           <button type="submit">
-            Signin
+            Send
           </button>
-          <button type="button" onClick={this.onForgetPasswordClicked}>
-            Forget Password
+          <button type="button" onClick={this.onBackToLoginClicked}>
+            Back to Login
           </button>
         </div>
       </form>
@@ -69,9 +58,9 @@ class Signin extends Component {
   }
 }
 
-Signin = reduxForm({
-  form: 'Signin' // a unique identifier for this form
-})(Signin);
+ForgetPassword = reduxForm({
+  form: 'ForgetPassword' // a unique identifier for this form
+})(ForgetPassword);
 
 function mapStateToProp(state) {
   return {
@@ -79,7 +68,7 @@ function mapStateToProp(state) {
   };
 }
 
-Signin = connect(mapStateToProp, { loginUser })(withRouter(Signin));
+ForgetPassword = connect(mapStateToProp, { forgotPassword })(withRouter(ForgetPassword));
 
 
-export default Signin;
+export default ForgetPassword;
