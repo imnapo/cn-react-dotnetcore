@@ -9,6 +9,7 @@ import reduxThunk from 'redux-thunk';
 require('es6-promise').polyfill();
 require('./Polyfills/index').startsWith();
 require('./Polyfills/index').assign();
+require('./Polyfills/index').from();
 
 import App from './components/App';
 import Signup from './components/auth/Signup';

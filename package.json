@@ -21,8 +21,12 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "webpack": "^4.20.2",
-    "webpack-cli": "^3.1.2"
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-middleware": "^3.5.0",
+    "webpack-hot-middleware": "^2.24.3",
+    "style-loader": "^0.23.1",
+    "css-loader": "^2.1.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
@@ -33,6 +37,7 @@
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.0",
     "redux-form": "^7.4.2",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "react-hot-loader": "^4.6.3"
   }
 }
